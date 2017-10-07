@@ -1,24 +1,40 @@
 package cn.summerwaves.controller;
 
+import cn.summerwaves.model.Excellence;
+import cn.summerwaves.model.Position;
 import cn.summerwaves.model.User;
+import cn.summerwaves.service.IExcellenceService;
+import cn.summerwaves.service.IPositionService;
 import cn.summerwaves.service.IUserService;
+import cn.summerwaves.util.CookieUtil;
+import cn.summerwaves.util.TokenUtil;
 import org.apache.ibatis.annotations.ConstructorArgs;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.UnsupportedEncodingException;
+import java.util.Date;
+import java.util.List;
 
 @Controller
 public class InterceptorController {
 
     @Resource
     private IUserService userService;
+    @Resource
+    private IExcellenceService excellenceService;
+    @Resource
+    private IPositionService positionService;
+
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public ModelAndView toLogin(@Param("username")String username,@Param("password")String password,HttpServletRequest request,HttpServletResponse response) {
@@ -27,13 +43,16 @@ public class InterceptorController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ModelAndView login(@Param("username")String username,@Param("password")String password,HttpServletRequest request,HttpServletResponse response) {
+    public ModelAndView login(@Param("username")String username,@Param("password")String password,HttpServletRequest request,HttpServletResponse response) throws Exception {
         ModelAndView mv = new ModelAndView();
         User realUser = null;
         realUser = userService.selectUserByName(username);
-        if (realUser != null && realUser.getPassword().equals(password)) {
-            HttpSession session = request.getSession();
-            session.setAttribute("message", username);
+
+        if (realUser != null && realUser.getPassword().equals(userService.setPasswordBySalt(username,password))) {
+
+            String token = TokenUtil.makeToken(realUser.getUsername());
+            Cookie tokenCookie = CookieUtil.createCookie("token", token, 60 * 60 * 24 * 10);
+            response.addCookie(tokenCookie);
             mv.setViewName("loginSuccess");
             mv.addObject("username", realUser.getUsername());
             return mv;
@@ -41,6 +60,28 @@ public class InterceptorController {
             mv.setViewName("loginFail");
             return mv;
         }
+    }
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public String toRegister() {
+        return "register";
+    }
+
+    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    public ModelAndView register(HttpServletRequest request) {
+        ModelAndView mv = new ModelAndView();
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        if (userService.selectUserByName(username) == null && !username.equals("") && !password.equals("") && username.length() >= 2) {
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword(userService.setPasswordBySalt(username, password));
+            userService.insertUser(user);
+            mv.setViewName("login");
+            return mv;
+        }
+        mv.setViewName("registerFail");
+        return mv;
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -53,14 +94,19 @@ public class InterceptorController {
         return "skipToLogin";
     }
 
-    @RequestMapping(value = "/home", method = RequestMethod.GET)
-    public String toHome() {
-        return "home";
+    @RequestMapping(value = "/home",method = RequestMethod.GET)
+    public ModelAndView toT10() {
+        ModelAndView mv = new ModelAndView("home");
+        List<Excellence> excellencelist = excellenceService.selectExcellenceByName();
+        mv.addObject("excellencelist",excellencelist);
+        return mv;
     }
-
-    @RequestMapping(value = "/u/position", method = RequestMethod.GET)
-    public String toPosition() {
-        return "position";
+    @RequestMapping(value = "/u/position")
+    public ModelAndView toT11() {
+        ModelAndView mv = new ModelAndView("position");
+        List<Position> positions = positionService.selectPositionByType(1);
+        mv.addObject("positions", positions);
+        return mv;
     }
 
 }

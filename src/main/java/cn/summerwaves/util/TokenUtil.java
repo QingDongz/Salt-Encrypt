@@ -1,0 +1,45 @@
+package cn.summerwaves.util;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.math.BigInteger;
+
+public class TokenUtil {
+    static String TOKEN_NAME = "token";
+
+  /*  private TokenUtil(){
+
+    }
+    private static final TokenUtil instance = new TokenUtil();
+
+    public static TokenUtil getInstance(){
+        return instance;
+    }*/
+
+    public static String makeToken(String username) throws Exception {
+        String s1 = username;
+        String s2 = System.currentTimeMillis() + "";
+        String s3 = MD5Util.getMd5(s1 + s2 + "Md5key");
+        DesUtil desUtil = new DesUtil("desKey");
+        return desUtil.encrypt(s1 + "," + s2 + "," + s3);
+    }
+
+    public static boolean checkToken(String token) throws Exception {
+
+        DesUtil desUtil = new DesUtil("desKey");
+        String check = desUtil.decrypt(token);
+        String[] str = check.split(",");
+        String checkMd5 = MD5Util.getMd5(str[0] + str[1] + "Md5key");
+        long now = System.currentTimeMillis();
+        long before = Long.parseLong(str[1]);
+        long time = now - before;
+        if (checkMd5.equals(str[2]) && time < 10000) {
+
+            return true;
+        }
+        return false;
+    }
+
+
+}

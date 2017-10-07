@@ -11,10 +11,10 @@
     <title>Title</title>
 </head>
 <body>
-登录成功，${username}
+登录成功，${username}<br>
 <script>
     function jumpurl(){
-        location='http://www.summerwaves.cn/u/position';
+        location='http://localhost:8080/task5/u/position';
     }
     setTimeout('jumpurl()',3000);
 </script>

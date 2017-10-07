@@ -14,7 +14,7 @@
 登录失败,请重新登录
 <script>
     function jumpurl(){
-        location='http://www.summerwaves.cn/login';
+        location='http://localhost:8080/task5/login';
     }
     setTimeout('jumpurl()',3000);
 </script>

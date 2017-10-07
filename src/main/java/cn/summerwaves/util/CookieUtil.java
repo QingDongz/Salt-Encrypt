@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ public class CookieUtil {
         return null;
     }
 
-    public static Cookie creatCookie(String name, String value, Integer expire) throws UnsupportedEncodingException {
+    public static Cookie createCookie(String name, String value, Integer expire) throws UnsupportedEncodingException {
         Cookie cookie = new Cookie(name.trim(), URLEncoder.encode(value.trim(),"UTF-8"));
         cookie.setMaxAge(expire);
         cookie.setPath("/");
@@ -53,11 +54,13 @@ public class CookieUtil {
         if (cookie != null) {
             cookie.setMaxAge(expire);
             cookie.setValue(URLEncoder.encode(value, "UTF-8"));
-        } else if (cookie == null){
+        } else{
             if (creatd) {
-                cookie = creatCookie(name, value, expire);
+                cookie = createCookie(name, value, expire);
             }
+
         }
             return cookie;
     }
+
 }

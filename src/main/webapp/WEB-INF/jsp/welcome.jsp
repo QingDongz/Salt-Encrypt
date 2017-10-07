@@ -14,6 +14,7 @@
 </head>
 <body>
 <a href="${ctx}/login">登录页面</a><br>
+<a href="${ctx}/user">注册页面</a><br>
 <a href="${ctx}/u/position">拦截页面</a><br>
 <a href="${ctx}/home">不拦截页面</a>
 </body>

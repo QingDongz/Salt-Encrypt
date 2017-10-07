@@ -80,7 +80,9 @@ public class InterceptorController {
             //密码加盐
             user.setPassword(userService.setPasswordBySalt(username, password));
             userService.insertUser(user);
-            mv.setViewName("login");
+            mv.addObject("username", user.getUsername());
+            mv.addObject("password", user.getPassword());
+            mv.setViewName("registerSuccess");
             return mv;
         }
         mv.setViewName("registerFail");

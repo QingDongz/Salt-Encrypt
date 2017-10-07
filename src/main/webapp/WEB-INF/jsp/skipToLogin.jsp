@@ -16,7 +16,7 @@
 <a href="${ctx}/login">未登录，请登陆后查看</a>
 <script>
     function jumpurl(){
-        location='http://localhost:8080/task5/login';
+        location='http://www.summerwaves.cn/login';
     }
     setTimeout('jumpurl()',3000);
 </script>

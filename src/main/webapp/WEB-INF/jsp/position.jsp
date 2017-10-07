@@ -22,7 +22,7 @@
 <body>
 <header>
     <div class="top container">
-        <p class="hidden-xs">客服热线：010-594-78634</p>
+        <p class="hidden-xs">客服热线：010-594-78634</p>&nbsp;${username}
         <img src="${ctx}/static/png/12321.gif">
     </div>
 

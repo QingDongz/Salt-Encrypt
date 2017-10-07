@@ -14,7 +14,7 @@
 登录成功，${username}<br>
 <script>
     function jumpurl(){
-        location='http://localhost:8080/task5/u/position';
+        location='http://www.summerwaves.cn/u/position';
     }
     setTimeout('jumpurl()',3000);
 </script>

@@ -19,7 +19,7 @@ public class TokenUtil {
         DesUtil desUtil = new DesUtil("desKey");
         String check = desUtil.decrypt(token);
         String[] str = check.split(",");
-        String checkMd5 = MD5Util.getMd5(str[0] + str[1] + "Md5ke");
+        String checkMd5 = MD5Util.getMd5(str[0] + str[1] + "Md5key");
         long now = System.currentTimeMillis();
         long before = Long.parseLong(str[1]);
         long time = now - before;

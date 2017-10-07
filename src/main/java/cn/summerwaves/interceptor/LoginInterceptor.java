@@ -15,12 +15,9 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
-        /*String session = (String) httpServletRequest.getSession().getAttribute("cookieValue");*/
         Cookie cookie = CookieUtil.getCookieByName(httpServletRequest, "token");
-        if (cookie == null) {
-            httpServletRequest.getRequestDispatcher("/skip").forward(httpServletRequest, httpServletResponse);
-            return false;
-        } else if (!TokenUtil.checkToken(cookie.getValue())) {
+        //找不到token或token验证失败
+        if (cookie == null || !TokenUtil.checkToken(cookie.getValue())) {
             httpServletRequest.getRequestDispatcher("/skip").forward(httpServletRequest, httpServletResponse);
             return false;
         }
@@ -29,7 +26,8 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
-
+        Cookie cookie = CookieUtil.getCookieByName(httpServletRequest, "token");
+        modelAndView.addObject("username", TokenUtil.getUsernameInToken(cookie.getValue()));
     }
 
     @Override

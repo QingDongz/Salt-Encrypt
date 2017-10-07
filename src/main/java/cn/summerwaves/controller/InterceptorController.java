@@ -43,13 +43,14 @@ public class InterceptorController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ModelAndView login(@Param("username")String username,@Param("password")String password,HttpServletRequest request,HttpServletResponse response) throws Exception {
+    public ModelAndView login(@Param("username")String username,@Param("password")String password,
+                              HttpServletResponse response) throws Exception {
         ModelAndView mv = new ModelAndView();
-        User realUser = null;
+        User realUser;
         realUser = userService.selectUserByName(username);
-
+        /*登录时使用加盐算法*/
         if (realUser != null && realUser.getPassword().equals(userService.setPasswordBySalt(username,password))) {
-
+            //生成token并添加到设定好的Cookie中
             String token = TokenUtil.makeToken(realUser.getUsername());
             Cookie tokenCookie = CookieUtil.createCookie("token", token, 60 * 60 * 24 * 10);
             response.addCookie(tokenCookie);
@@ -71,10 +72,12 @@ public class InterceptorController {
         ModelAndView mv = new ModelAndView();
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-
-        if (userService.selectUserByName(username) == null && !username.equals("") && !password.equals("") && username.length() >= 2) {
+        //防止重复的用户名，以及用户名、密码为空，并要求用户名要不小于2
+        if (userService.selectUserByName(username) == null && !username.equals("")
+                && !password.equals("") && username.length() >= 2) {
             User user = new User();
             user.setUsername(username);
+            //密码加盐
             user.setPassword(userService.setPasswordBySalt(username, password));
             userService.insertUser(user);
             mv.setViewName("login");
